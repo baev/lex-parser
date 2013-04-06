@@ -28,7 +28,8 @@ public class Parser {
 
         lexicalAnalyzer.nextTaken();
         if (lexicalAnalyzer.hasNextToken()) {
-            throw new ParseException("Expected END but has " + lexicalAnalyzer.getCurentToken(), lexicalAnalyzer.getPosition());
+            throw new ParseException("Expected END but has "
+                    + lexicalAnalyzer.getCurentToken(), lexicalAnalyzer.getPosition());
         }
 
         return result;
