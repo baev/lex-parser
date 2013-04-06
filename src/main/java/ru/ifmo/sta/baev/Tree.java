@@ -8,10 +8,10 @@ import java.util.List;
  *         Date: 01.04.13
  */
 public class Tree {
-    Token token;
-    Integer value = null;
-    Tree first = null;
-    Tree second = null;
+    private Token token;
+    private Integer value = null;
+    private Tree first = null;
+    private Tree second = null;
 
     public Tree() {
         this.token = Token.END;
@@ -26,5 +26,38 @@ public class Tree {
         this.first = first;
         this.second = second;
         this.token = token;
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public Integer getValue() {
+        return value;
+    }
+
+    public Tree getFirst() {
+        return first;
+    }
+
+    public Tree getSecond() {
+        return second;
+    }
+
+    @Override
+    public String toString() {
+        switch (token) {
+            case END:
+                return "$";
+            case OPERAND:
+                return value.toString();
+            case PLUS:
+                return "+";
+            case MINUS:
+                return "-";
+            case MULTIPLICATION:
+                return "*";
+        }
+        return "null";
     }
 }
