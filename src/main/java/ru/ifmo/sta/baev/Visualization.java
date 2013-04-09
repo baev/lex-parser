@@ -1,6 +1,5 @@
 package ru.ifmo.sta.baev;
 
-import org.jfree.ui.tabbedui.AbstractTabbedUI;
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.GraphConstants;
@@ -11,104 +10,99 @@ import org.jgrapht.graph.ListenableDirectedGraph;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.ByteArrayInputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.ClassLoader.getSystemResourceAsStream;
-
 /**
- * A demo applet that shows how to use JGraph to visualize JGraphT graphs.
- *
- * @author Barak Naveh
- * @since Aug 3, 2003
+ * @author Dmitry Baev charlie@yandex-team.ru
+ *         Date: 06.04.13
  */
 public class Visualization extends JApplet {
     private static final Color DEFAULT_BG_COLOR = Color.decode("#FAFBFF");
-    private static final Dimension DEFAULT_SIZE = new Dimension(530, 320);
-    private static final String FILE_PATH = "ru/ifmo/sta/baev/visualization/vz-sample.txt";
+    private static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
 
-    private JGraphModelAdapter<String, DefaultEdge> m_jgAdapter;
+    private static final int X_OFFSET = 70;
+    private static final int Y_OFFSET = 70;
+
+    private int MAX_X_OFFSET = 0;
+    private int MAX_Y_OFFSET = 0;
+
+    private JGraphModelAdapter<Tree, DefaultEdge> m_jgAdapter;
+    Tree tree4visualization;
 
     public Visualization() throws HeadlessException {
+        System.out.println("Creating visualizer...");
+
+        String expression = "+ - 1 * 2 3 4";
+
+        try {
+            tree4visualization = Parser.parse(new ByteArrayInputStream(expression.getBytes()));
+        } catch (ParseException e) {
+            throw new HeadlessException("Initialisation problems: " + e.getMessage());
+        }
     }
 
     public void init() {
+        System.out.println("Applet initializing...");
+
         //delete standard menu
         Frame[] frames = Frame.getFrames();
         for (Frame frame : frames) {
             frame.setMenuBar(null);
             frame.pack();
         }
-//
-//        //add my menu
-//        JMenuBar menuBar = new JMenuBar();
-//        JMenu menu = new JMenu("Menu");
-//        menuBar.add(menu);
-//        JMenuItem item = new JMenuItem("Open...");
-//        item.addActionListener(actionListener);
-//        menu.add(item);
-//        setJMenuBar(menuBar);
 
-
-
-        // create a JGraphT graph
-        ListenableGraph<String, DefaultEdge> g = new ListenableDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
-
-        // create a visualization using JGraph, via an adapter
-        m_jgAdapter = new JGraphModelAdapter<String, DefaultEdge>(g);
-
+        ListenableGraph<Tree, DefaultEdge> graph = new ListenableDirectedGraph<Tree, DefaultEdge>(DefaultEdge.class);
+        m_jgAdapter = new JGraphModelAdapter<Tree, DefaultEdge>(graph);
         JGraph jgraph = new JGraph(m_jgAdapter);
 
-        adjustDisplaySettings(jgraph);
-        getContentPane().add(jgraph);
         resize(DEFAULT_SIZE);
 
-        String file = "+ 1 2";
-        Tree tree = null;
-        try {
-            tree = Parser.parse(new ByteArrayInputStream(file.getBytes()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        createGraphFromTree(graph, tree4visualization, null, 0, 1);
 
-        assert tree != null;
-        g.addVertex(tree.toString());
-        w
+        MAX_X_OFFSET += (100 + X_OFFSET);
+        MAX_Y_OFFSET += Y_OFFSET;
 
-//        g.addVertex("v1");
-//        g.addVertex("v2");
-//        g.addVertex("v3");
-//        g.addVertex("v4");
-//
-//        g.addEdge("v1", "v2");
-//        g.addEdge("v2", "v3");
-//        g.addEdge("v3", "v1");
-//        g.addEdge("v4", "v3");
-//
-//        // position vertices nicely within JGraph component
-//        positionVertexAt("v1", 130, 40);
-//        positionVertexAt("v2", 60, 200);
-//        positionVertexAt("v3", 310, 230);
-//        positionVertexAt("v4", 380, 70);
+        adjustDisplaySettings(jgraph);
 
-        // that's all there inputStream to it!...
+        getContentPane().add(new JScrollPane(jgraph, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS));
     }
 
-    private void createG(ListenableGraph<String, DefaultEdge> g, Tree tree) {
-        g.addVertex(tree.toString());
+    private int createGraphFromTree(ListenableGraph<Tree, DefaultEdge> graph, Tree tree,
+                                    Tree parent, int parentXOffset, int parentYOffset) {
 
+        graph.addVertex(tree);
+        if (parent != null) {
+            graph.addEdge(parent, tree);
+        }
+
+        if (tree.getToken().equals(Token.END) || tree.getToken().equals(Token.OPERAND)) {
+            positionVertexAt(tree, (1 + parentXOffset) * X_OFFSET, parentYOffset * Y_OFFSET);
+            return 1;
+        }
+
+        Tree l = tree.getLeft();
+        Tree r = tree.getRight();
+
+        int offsetLeft = createGraphFromTree(graph, l, tree, parentXOffset, parentYOffset + 1);
+        int offsetRight = createGraphFromTree(graph, r, tree, offsetLeft + parentXOffset + 1, parentYOffset + 1);
+
+        positionVertexAt(tree, (offsetLeft + parentXOffset + 1) * X_OFFSET, parentYOffset * Y_OFFSET);
+
+        return offsetLeft + offsetRight + 1;
     }
 
     private void adjustDisplaySettings(JGraph jg) {
-        jg.setPreferredSize(DEFAULT_SIZE);
+        jg.setPreferredSize(new Dimension(MAX_X_OFFSET, MAX_Y_OFFSET));
 
         Color c = DEFAULT_BG_COLOR;
         String colorStr = null;
 
         try {
             colorStr = getParameter("bgcolor");
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         if (colorStr != null) {
@@ -120,10 +114,17 @@ public class Visualization extends JApplet {
 
 
     private void positionVertexAt(Object vertex, int x, int y) {
+        if (MAX_X_OFFSET < x) {
+            MAX_X_OFFSET = x;
+        }
+        if (MAX_Y_OFFSET < y) {
+            MAX_Y_OFFSET = y;
+        }
+
         DefaultGraphCell cell = m_jgAdapter.getVertexCell(vertex);
         Map attr = cell.getAttributes();
         Rectangle b = GraphConstants.getBounds(attr).getBounds();
-        GraphConstants.setBounds( attr, new Rectangle( x, y, b.width, b.height ) );
+        GraphConstants.setBounds(attr, new Rectangle(x, y, b.width, b.height));
 
 
         Map<DefaultGraphCell, Map> cellAttr = new HashMap<DefaultGraphCell, Map>();

@@ -1,8 +1,5 @@
 package ru.ifmo.sta.baev;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Dmitry Baev charlie@yandex-team.ru
  *         Date: 01.04.13
@@ -10,8 +7,8 @@ import java.util.List;
 public class Tree {
     private Token token;
     private Integer value = null;
-    private Tree first = null;
-    private Tree second = null;
+    private Tree left = null;
+    private Tree right = null;
 
     public Tree() {
         this.token = Token.END;
@@ -22,9 +19,9 @@ public class Tree {
         this.value = value;
     }
 
-    public Tree(Token token, Tree first, Tree second) {
-        this.first = first;
-        this.second = second;
+    public Tree(Token token, Tree left, Tree right) {
+        this.left = left;
+        this.right = right;
         this.token = token;
     }
 
@@ -36,12 +33,12 @@ public class Tree {
         return value;
     }
 
-    public Tree getFirst() {
-        return first;
+    public Tree getLeft() {
+        return left;
     }
 
-    public Tree getSecond() {
-        return second;
+    public Tree getRight() {
+        return right;
     }
 
     @Override
