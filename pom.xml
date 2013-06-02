@@ -13,20 +13,16 @@
             <artifactId>jgraph</artifactId>
             <version>5.13.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.activequant</groupId>
-            <artifactId>aq2o-apps</artifactId>
-            <version>2.2-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>org.jgrapht</groupId>
             <artifactId>jgrapht-jdk1.5</artifactId>
             <version>0.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.9</version>
         </dependency>
     </dependencies>
 

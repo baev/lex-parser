@@ -10,7 +10,7 @@ import org.jgrapht.graph.ListenableDirectedGraph;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class Visualization extends JApplet {
     public Visualization() throws HeadlessException {
         System.out.println("Creating visualizer...");
 
-        String expression = "+ - 1 * 2 3 4";
+        String expression = "+ - 1 * 2 - 4 - 5 4 + * 10 + 1 2 2";
 
         try {
             tree4visualization = Parser.parse(new ByteArrayInputStream(expression.getBytes()));
@@ -59,7 +59,12 @@ public class Visualization extends JApplet {
 
         resize(DEFAULT_SIZE);
 
-        createGraphFromTree(graph, tree4visualization, null, 0, 1);
+
+        createGraphFromTree(graph, tree4visualization, null, 0, 2);
+//        Tree s = new Tree("S");
+//        graph.addVertex(s);
+//        graph.addEdge(s, tree4visualization);
+//        positionVertexAt(s, offset / 2 * X_OFFSET, Y_OFFSET);
 
         MAX_X_OFFSET += (100 + X_OFFSET);
         MAX_Y_OFFSET += Y_OFFSET;
@@ -78,16 +83,31 @@ public class Visualization extends JApplet {
             graph.addEdge(parent, tree);
         }
 
-        if (tree.getToken().equals(Token.END) || tree.getToken().equals(Token.OPERAND)) {
+        if (tree.getLeft() == null
+                && tree.getRight() == null
+                && tree.getOperator() == null) {
             positionVertexAt(tree, (1 + parentXOffset) * X_OFFSET, parentYOffset * Y_OFFSET);
             return 1;
+        }
+
+        if (tree.getRight() == null
+                && tree.getLeft() == null
+                && tree.getOperator() != null) {
+            int offset = createGraphFromTree(graph,
+                    tree.getOperator(), tree, parentXOffset, parentYOffset + 1);
+            positionVertexAt(tree, (1 + parentXOffset + offset) * X_OFFSET, parentYOffset * Y_OFFSET);
+            return offset + 1;
         }
 
         Tree l = tree.getLeft();
         Tree r = tree.getRight();
 
-        int offsetLeft = createGraphFromTree(graph, l, tree, parentXOffset, parentYOffset + 1);
-        int offsetRight = createGraphFromTree(graph, r, tree, offsetLeft + parentXOffset + 1, parentYOffset + 1);
+        int offsetOperator = createGraphFromTree(graph,
+                tree.getOperator(), tree, parentXOffset, parentYOffset + 1);
+        int offsetLeft = createGraphFromTree(graph,
+                l, tree, offsetOperator + parentXOffset + 1, parentYOffset + 1);
+        int offsetRight = createGraphFromTree(graph,
+                r, tree, offsetOperator + offsetLeft + parentXOffset + 2, parentYOffset + 1);
 
         positionVertexAt(tree, (offsetLeft + parentXOffset + 1) * X_OFFSET, parentYOffset * Y_OFFSET);
 

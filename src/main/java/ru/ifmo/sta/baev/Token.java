@@ -5,6 +5,6 @@ package ru.ifmo.sta.baev;
  *         Date: 01.04.13
  */
 public enum Token {
-    OPERAND, PLUS, MINUS, MULTIPLICATION, END
+    OPERAND, PLUS, MINUS, MULTIPLICATION, END;
 
 }

@@ -28,7 +28,7 @@ public class ParserSEpsTest {
 
     @Test
     public void sEpsTest() throws ParseException {
-        Tree tree = Parser.parse(inputStream);
+        Tree tree = Parser.parse(inputStream).getOperator();
         assertThat(tree.getToken(), is(Token.END));
     }
 }

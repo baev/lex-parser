@@ -26,7 +26,7 @@ public class ParserAMinusAATest {
     @Before
     public void loadFile() throws ParseException {
         inputStream = getSystemResourceAsStream(FILE_PATH);
-        tree = Parser.parse(inputStream);
+        tree = Parser.parse(inputStream).getOperator();
     }
 
     @Test

@@ -28,7 +28,7 @@ public class ParserAConstTest {
 
     @Test
     public void aConstTest() throws ParseException {
-        Tree tree = Parser.parse(inputStream);
+        Tree tree = Parser.parse(inputStream).getOperator();
         assertThat(tree.getToken(), is(Token.OPERAND));
         assertThat(tree.getValue(), is(2));
     }

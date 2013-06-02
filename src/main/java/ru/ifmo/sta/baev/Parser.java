@@ -20,10 +20,10 @@ public class Parser {
 
         switch (curToken) {
             case END:
-                result =  new Tree();
+                result =  new Tree(new Tree(Token.END));
                 break;
             default:
-                result = A(lexicalAnalyzer);
+                result = new Tree(A(lexicalAnalyzer));
         }
 
         lexicalAnalyzer.nextTaken();
