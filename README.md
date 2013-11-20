@@ -24,7 +24,7 @@ A -> *AA
 PLUS, MINUS, MULTIPLICATION, OPERAND, END
 ```
 
-### 3
+### First and Follow
 
 ```
 FIRST(S) : eps, a, +, -, *
